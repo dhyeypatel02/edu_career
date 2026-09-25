@@ -1,0 +1,7 @@
+{
+  "name": "Margdarshak - India Career Pathways & Counsellor",
+  "description": "Comprehensive step-by-step career decision tree and AI counsellor for Indian students after Class 10 and 12, mapping streams, entrance exams, degrees, and roadmaps.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
