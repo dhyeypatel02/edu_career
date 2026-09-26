@@ -1,11 +1,11 @@
 import { UserProfile, SavedUserPathway } from '../types/career';
 
-const USERS_STORAGE_KEY = 'disha_users';
-const CURRENT_USER_KEY = 'disha_current_user';
+const USERS_STORAGE_KEY = 'educareer_users';
+const CURRENT_USER_KEY = 'educareer_current_user';
 
 export function getAllUsers(): UserProfile[] {
   try {
-    const raw = localStorage.getItem(USERS_STORAGE_KEY);
+    const raw = localStorage.getItem(USERS_STORAGE_KEY) || localStorage.getItem('disha_users');
     return raw ? JSON.parse(raw) : [];
   } catch (e) {
     console.error('Failed to get users from localStorage', e);
@@ -23,7 +23,7 @@ export function saveAllUsers(users: UserProfile[]): void {
 
 export function getCurrentUser(): UserProfile | null {
   try {
-    const raw = localStorage.getItem(CURRENT_USER_KEY);
+    const raw = localStorage.getItem(CURRENT_USER_KEY) || localStorage.getItem('disha_current_user');
     if (!raw) return null;
     const currentUser: UserProfile = JSON.parse(raw);
     // Keep in sync with latest stored profile

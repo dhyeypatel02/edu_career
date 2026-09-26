@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
             title="Return to Home"
           >
             <span className="text-xl font-extrabold tracking-tight text-white transition-colors group-hover:text-neutral-200">
-              Disha<span className="text-emerald-400">.</span>
+              Edu Career<span className="text-emerald-400">.</span>
             </span>
             <span className="hidden md:inline-block text-xs text-neutral-400 border-l border-neutral-800 pl-2.5">
               Career & Education Pathways

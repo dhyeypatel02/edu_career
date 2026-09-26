@@ -496,7 +496,7 @@ export default function App() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-white tracking-tight">Disha<span className="text-emerald-400">.</span></span>
+              <span className="font-bold text-white tracking-tight">Edu Career<span className="text-emerald-400">.</span></span>
               <span className="text-neutral-500">— Career & Education Pathways Engine</span>
             </div>
 

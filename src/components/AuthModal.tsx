@@ -66,7 +66,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg font-bold text-white tracking-tight">Disha<span className="text-emerald-400">.</span></span>
+            <span className="text-lg font-bold text-white tracking-tight">Edu Career<span className="text-emerald-400">.</span></span>
             <span className="text-xs font-mono px-2 py-0.5 rounded border border-neutral-800 bg-neutral-900 text-neutral-400">
               Student Profile
             </span>

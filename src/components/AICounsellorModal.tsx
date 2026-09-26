@@ -38,7 +38,7 @@ export const AICounsellorModal: React.FC<AICounsellorModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-white tracking-tight">
-                  Disha AI Counsellor
+                  Edu Career AI Counsellor
                 </h3>
                 <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-mono text-emerald-400 font-semibold">
                   Coming Soon
