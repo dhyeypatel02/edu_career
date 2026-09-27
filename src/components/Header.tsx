@@ -1,10 +1,11 @@
 import React from 'react';
-import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User, Zap } from 'lucide-react';
+import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User, Zap, Home } from 'lucide-react';
 import { StudentSelectionState, UserProfile } from '../types/career';
 
 interface HeaderProps {
   selectionState: StudentSelectionState;
   onReset: () => void;
+  onGoHome?: () => void;
   onOpenSearch: () => void;
   onOpenAICounsellor: () => void;
   onOpenPlacementHub: () => void;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({
   selectionState,
   onReset,
+  onGoHome,
   onOpenSearch,
   onOpenAICounsellor,
   onOpenPlacementHub,
@@ -35,9 +37,9 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand */}
         <div className="flex items-center gap-3">
           <button
-            onClick={onReset}
-            className="group flex items-baseline gap-2.5 text-left focus:outline-none"
-            title="Return to Home"
+            onClick={onGoHome || onReset}
+            className="group flex items-baseline gap-2.5 text-left focus:outline-none cursor-pointer"
+            title="Return to Home Overview"
           >
             <span className="text-xl font-extrabold tracking-tight text-white transition-colors group-hover:text-neutral-200">
               Edu Career<span className="text-emerald-400">.</span>
@@ -62,6 +64,18 @@ export const Header: React.FC<HeaderProps> = ({
               ⌘K
             </kbd>
           </button>
+
+          {/* Home Page Link */}
+          {onGoHome && (
+            <button
+              onClick={onGoHome}
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
+              title="Return to Home Overview"
+            >
+              <Home className="h-3.5 w-3.5 text-neutral-400" />
+              <span className="hidden sm:inline">Home</span>
+            </button>
+          )}
 
           {/* Placement Hub Button */}
           <button

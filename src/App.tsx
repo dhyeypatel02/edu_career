@@ -35,6 +35,8 @@ import { SavedPathsModal } from './components/SavedPathsModal';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
 import { PlacementHubModal } from './components/PlacementHubModal';
+import { HomePage } from './components/HomePage';
+import { LoginPage } from './components/LoginPage';
 
 export default function App() {
   // User Authentication & Profile State (Stored locally)
@@ -42,6 +44,19 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Active Screen View: 'home' (creative landing page) | 'login' (compulsory auth gate) | 'app' (decision engine)
+  const [activeView, setActiveView] = useState<'home' | 'login' | 'app'>('home');
+  const [loginMode, setLoginMode] = useState<'login' | 'signup'>('login');
+  const [pendingAction, setPendingAction] = useState<'placementHub' | 'counsellor' | null>(null);
+
+  // Compulsory authentication: Cannot access the interactive app without logging in
+  useEffect(() => {
+    if (activeView === 'app' && !currentUser) {
+      setLoginMode('login');
+      setActiveView('login');
+    }
+  }, [activeView, currentUser]);
 
   // Main Selection State
   const [selectionState, setSelectionState] = useState<StudentSelectionState>({
@@ -127,8 +142,8 @@ export default function App() {
 
   const handleSaveCurrentPathwayToUser = () => {
     if (!currentUser) {
-      setAuthMode('signup');
-      setIsAuthOpen(true);
+      setLoginMode('signup');
+      setActiveView('login');
       return;
     }
     if (currentPathwayObj) {
@@ -149,11 +164,20 @@ export default function App() {
         setCurrentUser({ ...updated });
       }
     }
+    setActiveView('app');
+    if (pendingAction === 'placementHub') {
+      setIsPlacementHubOpen(true);
+      setPendingAction(null);
+    } else if (pendingAction === 'counsellor') {
+      setIsAICounsellorOpen(true);
+      setPendingAction(null);
+    }
   };
 
   const handleLogout = () => {
     logoutUser();
     setCurrentUser(null);
+    setActiveView('home');
   };
 
   const handleRemoveUserPathway = () => {
@@ -339,12 +363,65 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Render Home Page (Creative Public Showcase)
+  if (activeView === 'home') {
+    return (
+      <HomePage
+        user={currentUser}
+        onGetStarted={() => {
+          if (!currentUser) {
+            setLoginMode('login');
+            setActiveView('login');
+          } else {
+            setActiveView('app');
+          }
+        }}
+        onOpenLogin={() => {
+          setLoginMode('login');
+          setActiveView('login');
+        }}
+        onOpenPlacementHub={() => {
+          if (!currentUser) {
+            setPendingAction('placementHub');
+            setLoginMode('login');
+            setActiveView('login');
+          } else {
+            setActiveView('app');
+            setIsPlacementHubOpen(true);
+          }
+        }}
+        onOpenAICounsellor={() => {
+          if (!currentUser) {
+            setPendingAction('counsellor');
+            setLoginMode('login');
+            setActiveView('login');
+          } else {
+            setActiveView('app');
+            setIsAICounsellorOpen(true);
+          }
+        }}
+      />
+    );
+  }
+
+  // Render Login Page (Compulsory Authentication Gate)
+  if (activeView === 'login') {
+    return (
+      <LoginPage
+        onSuccess={handleAuthSuccess}
+        onBackToHome={() => setActiveView('home')}
+        initialMode={loginMode}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0f1115] text-[#f1f3f7] flex flex-col font-sans">
       {/* Top Header */}
       <Header
         selectionState={selectionState}
         onReset={handleReset}
+        onGoHome={() => setActiveView('home')}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenAICounsellor={() => {
           setAiInitialQuestion('');
@@ -359,8 +436,8 @@ export default function App() {
         savedCount={bookmarkedCareerIds.length}
         user={currentUser}
         onOpenAuth={() => {
-          setAuthMode('login');
-          setIsAuthOpen(true);
+          setLoginMode('login');
+          setActiveView('login');
         }}
         onOpenProfile={() => setIsProfileOpen(true)}
       />
