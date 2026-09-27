@@ -34,6 +34,7 @@ import { CompareModal } from './components/CompareModal';
 import { SavedPathsModal } from './components/SavedPathsModal';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
+import { PlacementHubModal } from './components/PlacementHubModal';
 
 export default function App() {
   // User Authentication & Profile State (Stored locally)
@@ -64,6 +65,7 @@ export default function App() {
   // Modal Visibility States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAICounsellorOpen, setIsAICounsellorOpen] = useState(false);
+  const [isPlacementHubOpen, setIsPlacementHubOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [compareInitialDegreeId, setCompareInitialDegreeId] = useState<string | undefined>();
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
@@ -336,6 +338,7 @@ export default function App() {
           setAiInitialQuestion('');
           setIsAICounsellorOpen(true);
         }}
+        onOpenPlacementHub={() => setIsPlacementHubOpen(true)}
         onOpenCompare={() => {
           setCompareInitialDegreeId(selectionState.selectedDegree?.id || 'btech-cse');
           setIsCompareOpen(true);
@@ -489,6 +492,13 @@ export default function App() {
         savedCareerIds={bookmarkedCareerIds}
         onRemoveBookmark={(id) => handleToggleBookmark(id)}
         onLoadSavedCareer={handleLoadSavedCareer}
+      />
+
+      <PlacementHubModal
+        isOpen={isPlacementHubOpen}
+        onClose={() => setIsPlacementHubOpen(false)}
+        onAskAI={handleAskAIWithQuestion}
+        initialCareer={selectionState.selectedCareer}
       />
 
       {/* Footer */}

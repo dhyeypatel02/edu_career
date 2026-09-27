@@ -3,8 +3,9 @@ import { STREAMS_DATA } from './streamsData';
 import { TRACKS_DATA } from './tracksData';
 import { DEGREES_DATA } from './degreesData';
 import { CAREERS_DATA } from './careersData';
+import { CAREER_EXECUTION_PIPELINES, getCareerExecutionPipeline } from './careerExecutionData';
 
-export { STREAMS_DATA, TRACKS_DATA, DEGREES_DATA, CAREERS_DATA };
+export { STREAMS_DATA, TRACKS_DATA, DEGREES_DATA, CAREERS_DATA, CAREER_EXECUTION_PIPELINES, getCareerExecutionPipeline };
 
 export function getStreamById(id: StreamId | string): Stream | undefined {
   return STREAMS_DATA.find((s) => s.id === id);

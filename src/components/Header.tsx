@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User } from 'lucide-react';
+import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User, Zap } from 'lucide-react';
 import { StudentSelectionState, UserProfile } from '../types/career';
 
 interface HeaderProps {
@@ -7,6 +7,7 @@ interface HeaderProps {
   onReset: () => void;
   onOpenSearch: () => void;
   onOpenAICounsellor: () => void;
+  onOpenPlacementHub: () => void;
   onOpenCompare: () => void;
   onOpenBookmarks: () => void;
   savedCount: number;
@@ -20,6 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   onReset,
   onOpenSearch,
   onOpenAICounsellor,
+  onOpenPlacementHub,
   onOpenCompare,
   onOpenBookmarks,
   savedCount,
@@ -59,6 +61,19 @@ export const Header: React.FC<HeaderProps> = ({
             <kbd className="hidden lg:inline rounded border border-neutral-700 bg-neutral-800 px-1 text-[10px] text-neutral-400">
               ⌘K
             </kbd>
+          </button>
+
+          {/* Placement Hub Button */}
+          <button
+            onClick={onOpenPlacementHub}
+            className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/30 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-900/40 hover:border-emerald-400"
+            title="College-to-Placement 9-Stage Execution Hub"
+          >
+            <Zap className="h-3.5 w-3.5 text-emerald-400" />
+            <span className="hidden md:inline">Placement Hub</span>
+            <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-mono text-emerald-300">
+              9-Stage
+            </span>
           </button>
 
           {/* Compare Tool */}

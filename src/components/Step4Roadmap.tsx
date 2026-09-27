@@ -16,9 +16,11 @@ import {
   ExternalLink,
   User,
   RefreshCw,
+  Zap,
 } from 'lucide-react';
 import { Stream, Track, Degree, Career, UserProfile } from '../types/career';
 import { getCareersByDegree, CAREERS_DATA } from '../data';
+import { CareerExecutionHub } from './CareerExecutionHub';
 
 interface Step4RoadmapProps {
   stream: Stream;
@@ -63,7 +65,7 @@ export const Step4Roadmap: React.FC<Step4RoadmapProps> = ({
       user.savedPathway.degreeId === degree.id
   );
 
-  const [activeTab, setActiveTab] = useState<'roadmap' | 'alternatives' | 'growth'>('roadmap');
+  const [activeTab, setActiveTab] = useState<'roadmap' | 'launchpad' | 'alternatives' | 'growth'>('roadmap');
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handlePrint = () => {
@@ -312,32 +314,49 @@ export const Step4Roadmap: React.FC<Step4RoadmapProps> = ({
 
       {/* Tabs */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 print:hidden">
-        <div className="flex items-center gap-2 border-b border-neutral-800 pb-3">
+        <div className="flex flex-wrap items-center gap-2 border-b border-neutral-800 pb-3">
           <button
             onClick={() => setActiveTab('roadmap')}
             className={`rounded-lg px-4 py-2 text-xs font-bold transition ${
               activeTab === 'roadmap'
-                ? 'bg-neutral-100 text-neutral-950'
+                ? 'bg-neutral-100 text-neutral-950 shadow-sm'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
             Chronological Flowchart Roadmap
           </button>
+
+          <button
+            onClick={() => setActiveTab('launchpad')}
+            className={`rounded-lg px-4 py-2 text-xs font-bold transition flex items-center gap-1.5 ${
+              activeTab === 'launchpad'
+                ? 'bg-emerald-400 text-neutral-950 shadow-sm font-extrabold'
+                : 'text-emerald-400 hover:bg-emerald-500/10'
+            }`}
+          >
+            <Zap className="h-3.5 w-3.5" />
+            <span>Placement & Execution Engine</span>
+            <span className={`rounded px-1.5 py-0.2 text-[9px] font-mono ${activeTab === 'launchpad' ? 'bg-emerald-950/20 text-neutral-950' : 'bg-emerald-500/20 text-emerald-300'}`}>
+              9 Stages
+            </span>
+          </button>
+
           <button
             onClick={() => setActiveTab('alternatives')}
             className={`rounded-lg px-4 py-2 text-xs font-bold transition ${
               activeTab === 'alternatives'
-                ? 'bg-neutral-100 text-neutral-950'
+                ? 'bg-neutral-100 text-neutral-950 shadow-sm'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
             Alternative Routes ({activeCareer.alternativeRoutes.length})
           </button>
+
           <button
             onClick={() => setActiveTab('growth')}
             className={`rounded-lg px-4 py-2 text-xs font-bold transition ${
               activeTab === 'growth'
-                ? 'bg-neutral-100 text-neutral-950'
+                ? 'bg-neutral-100 text-neutral-950 shadow-sm'
                 : 'text-neutral-400 hover:text-white'
             }`}
           >
@@ -359,6 +378,13 @@ export const Step4Roadmap: React.FC<Step4RoadmapProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Content Section 0: Placement & Execution Engine (9 Stages) */}
+      {activeTab === 'launchpad' && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CareerExecutionHub career={activeCareer} onAskAI={onAskAI} />
+        </div>
+      )}
 
       {/* Content Section 1: Flowchart Roadmap */}
       {activeTab === 'roadmap' && (
