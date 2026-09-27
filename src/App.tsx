@@ -207,10 +207,22 @@ export default function App() {
 
   // Step 3: Select Degree
   const handleSelectDegree = (degree: Degree) => {
-    // Find matching career
-    const matchingCareer = CAREERS_DATA.find((c) =>
+    // 1. Find career directly linked to this specific degree
+    let matchingCareer = CAREERS_DATA.find((c) =>
       c.primaryDegreeIds.includes(degree.id) || degree.careerIds.includes(c.id)
-    ) || CAREERS_DATA[0];
+    );
+
+    // 2. If not found directly, find a career in the selected stream
+    if (!matchingCareer && selectionState.selectedStream) {
+      matchingCareer = CAREERS_DATA.find((c) =>
+        c.streamIds.includes(selectionState.selectedStream!.id)
+      );
+    }
+
+    // 3. Fallback to first available career in that stream or global
+    if (!matchingCareer) {
+      matchingCareer = CAREERS_DATA[0];
+    }
 
     setSelectionState((prev) => ({
       ...prev,

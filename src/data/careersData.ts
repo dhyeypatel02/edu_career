@@ -1,6 +1,7 @@
 import { Career } from '../types/career';
+import { ADDITIONAL_CAREERS } from './additionalCareers';
 
-export const CAREERS_DATA: Career[] = [
+const BASE_CAREERS: Career[] = [
   {
     id: 'career-software-engineer',
     title: 'Software Development Engineer & Tech Lead',
@@ -471,7 +472,7 @@ export const CAREERS_DATA: Career[] = [
     title: 'Civil Services Officer (IAS / IPS / IFS)',
     category: 'Public Administration & Governance',
     streamIds: ['humanities', 'commerce', 'science-pcm', 'science-pcb', 'polytechnic'],
-    primaryDegreeIds: ['ba-pol-science-history', 'btech-cse', 'mbbs', 'bcom-hons'],
+    primaryDegreeIds: ['ba-pol-science-history', 'ba-public-policy'],
     overview: 'Directs district governance, enforces law and order, oversees public healthcare, manages national disaster relief, leads foreign diplomatic missions, and crafts national policy.',
     sector: 'Government / Public',
     workEnvironment: 'District Collectorates / State Secretariats / Central Ministries / Indian Embassies',
@@ -849,3 +850,6 @@ export const CAREERS_DATA: Career[] = [
     topRecruiters: ['Google DeepMind', 'Microsoft Research India', 'Meta AI', 'Tower Research Capital', 'Jane Street', 'WorldQuant', 'Graviton Research', 'OpenAI (Global)'],
   },
 ];
+
+export const CAREERS_DATA: Career[] = [...BASE_CAREERS, ...ADDITIONAL_CAREERS];
+

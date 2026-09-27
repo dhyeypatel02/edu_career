@@ -1,6 +1,7 @@
 import { Degree } from '../types/career';
+import { ADDITIONAL_DEGREES } from './additionalDegrees';
 
-export const DEGREES_DATA: Degree[] = [
+const BASE_DEGREES: Degree[] = [
   // --- Engineering Degrees ---
   {
     id: 'btech-cse',
@@ -820,3 +821,6 @@ export const DEGREES_DATA: Degree[] = [
     alternativeRoutesNote: 'Massive advantage: Bypasses 11th-12th school entirely! Complete 3-year diploma, then enter directly into 2nd year B.Tech, finishing an engineering degree in the exact same 6 total years post-10th.',
   },
 ];
+
+export const DEGREES_DATA: Degree[] = [...BASE_DEGREES, ...ADDITIONAL_DEGREES];
+

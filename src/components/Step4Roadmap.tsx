@@ -57,7 +57,13 @@ export const Step4Roadmap: React.FC<Step4RoadmapProps> = ({
 }) => {
   // If career is not yet selected, find available careers for this degree
   const availableCareers = getCareersByDegree(degree);
-  const activeCareer = career || availableCareers[0] || CAREERS_DATA[0];
+  const streamFallback = CAREERS_DATA.find((c) => c.streamIds.includes(stream.id));
+  const isCareerValid = career && (
+    degree.careerIds.includes(career.id) ||
+    career.primaryDegreeIds.includes(degree.id) ||
+    career.streamIds.includes(stream.id)
+  );
+  const activeCareer = (isCareerValid ? career : null) || availableCareers[0] || streamFallback || CAREERS_DATA[0];
 
   const isUserSavedPathway = Boolean(
     user?.savedPathway &&
