@@ -1,0 +1,28 @@
+[
+  {
+    "id": "user_demo_101",
+    "name": "Arjun Sharma",
+    "email": "student.demo@educareer.in",
+    "password": "demo123",
+    "savedPathway": null,
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "user_1790536536257_29rog",
+    "name": "Dhyey Patel",
+    "email": "dhyey@example.com",
+    "password": "myPassword123",
+    "savedPathway": {
+      "streamId": "science-pcm",
+      "trackId": "track-pcm-cs",
+      "degreeId": "btech-cse",
+      "careerId": "career-software-engineer",
+      "streamTitle": "Science (PCM)",
+      "trackTitle": "Computer Science Track",
+      "degreeTitle": "B.Tech CSE",
+      "careerTitle": "Software Engineer",
+      "savedAt": "2026-09-27T19:15:53.537Z"
+    },
+    "createdAt": "2026-09-27T19:15:36.257Z"
+  }
+]

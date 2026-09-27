@@ -36,14 +36,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
     setLoading(true);
 
-    setTimeout(() => {
+    try {
       if (mode === 'signup') {
-        const res = registerUser(name, email, password);
+        const res = await registerUser(name, email, password);
         setLoading(false);
         if (res.success && res.user) {
           onSuccess(res.user);
@@ -51,7 +51,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           setErrorMessage(res.message || 'Registration failed. Please check your details.');
         }
       } else {
-        const res = loginUser(email, password);
+        const res = await loginUser(email, password);
         setLoading(false);
         if (res.success && res.user) {
           onSuccess(res.user);
@@ -59,26 +59,34 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           setErrorMessage(res.message || 'Invalid email or password.');
         }
       }
-    }, 200);
+    } catch (err: any) {
+      setLoading(false);
+      setErrorMessage(err.message || 'An error occurred during authentication.');
+    }
   };
 
-  const handleQuickDemoLogin = () => {
+  const handleQuickDemoLogin = async () => {
     setLoading(true);
-    setTimeout(() => {
-      // Check if demo user exists or create
+    setErrorMessage('');
+    try {
       const demoEmail = 'student.demo@educareer.in';
-      const existing = loginUser(demoEmail, 'demo123');
+      const existing = await loginUser(demoEmail, 'demo123');
       if (existing.success && existing.user) {
         setLoading(false);
         onSuccess(existing.user);
       } else {
-        const created = registerUser('Arjun Sharma', demoEmail, 'demo123');
+        const created = await registerUser('Arjun Sharma', demoEmail, 'demo123');
         setLoading(false);
         if (created.success && created.user) {
           onSuccess(created.user);
+        } else {
+          setErrorMessage(created.message || 'Demo login failed.');
         }
       }
-    }, 200);
+    } catch (err: any) {
+      setLoading(false);
+      setErrorMessage(err.message || 'Demo login failed.');
+    }
   };
 
   return (

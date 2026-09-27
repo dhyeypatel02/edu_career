@@ -26,26 +26,30 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (mode === 'signup') {
-      const res = registerUser(name, email, password, pendingPathway);
-      if (!res.success || !res.user) {
-        setErrorMessage(res.message || 'Registration failed.');
-        return;
+    try {
+      if (mode === 'signup') {
+        const res = await registerUser(name, email, password, pendingPathway);
+        if (!res.success || !res.user) {
+          setErrorMessage(res.message || 'Registration failed.');
+          return;
+        }
+        onAuthSuccess(res.user);
+        onClose();
+      } else {
+        const res = await loginUser(email, password);
+        if (!res.success || !res.user) {
+          setErrorMessage(res.message || 'Login failed.');
+          return;
+        }
+        onAuthSuccess(res.user);
+        onClose();
       }
-      onAuthSuccess(res.user);
-      onClose();
-    } else {
-      const res = loginUser(email, password);
-      if (!res.success || !res.user) {
-        setErrorMessage(res.message || 'Login failed.');
-        return;
-      }
-      onAuthSuccess(res.user);
-      onClose();
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Authentication error.');
     }
   };
 

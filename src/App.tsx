@@ -140,26 +140,26 @@ export default function App() {
         }
       : null;
 
-  const handleSaveCurrentPathwayToUser = () => {
+  const handleSaveCurrentPathwayToUser = async () => {
     if (!currentUser) {
       setLoginMode('signup');
       setActiveView('login');
       return;
     }
     if (currentPathwayObj) {
-      const updated = updateUserPathway(currentUser.id, currentPathwayObj);
+      const updated = await updateUserPathway(currentUser.id, currentPathwayObj);
       if (updated) {
         setCurrentUser({ ...updated });
       }
     }
   };
 
-  const handleAuthSuccess = (user: UserProfile) => {
+  const handleAuthSuccess = async (user: UserProfile) => {
     setCurrentUser(user);
     if (user.savedPathway) {
       loadPathwayIntoState(user.savedPathway);
     } else if (currentPathwayObj) {
-      const updated = updateUserPathway(user.id, currentPathwayObj);
+      const updated = await updateUserPathway(user.id, currentPathwayObj);
       if (updated) {
         setCurrentUser({ ...updated });
       }
@@ -180,9 +180,9 @@ export default function App() {
     setActiveView('home');
   };
 
-  const handleRemoveUserPathway = () => {
+  const handleRemoveUserPathway = async () => {
     if (currentUser) {
-      const updated = updateUserPathway(currentUser.id, null);
+      const updated = await updateUserPathway(currentUser.id, null);
       if (updated) {
         setCurrentUser({ ...updated });
       }

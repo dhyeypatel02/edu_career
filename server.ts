@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
@@ -13,6 +14,201 @@ const app = express();
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json());
+
+// -------------------------------------------------------------
+// Server-Side User Storage & Cross-Device Authentication
+// -------------------------------------------------------------
+const DATA_DIR = path.join(__dirname, 'data');
+const USERS_FILE = path.join(DATA_DIR, 'users.json');
+
+function loadServerUsers(): any[] {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (fs.existsSync(USERS_FILE)) {
+      const raw = fs.readFileSync(USERS_FILE, 'utf-8');
+      return JSON.parse(raw);
+    }
+  } catch (err) {
+    console.error('Failed to read users database:', err);
+  }
+  return [];
+}
+
+function saveServerUsers(users: any[]): void {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to save users database:', err);
+  }
+}
+
+// 1. Get All Users (Safe overview)
+app.get('/api/auth/users', (_req: Request, res: Response) => {
+  const users = loadServerUsers();
+  const safeUsers = users.map((u) => ({
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    savedPathway: u.savedPathway,
+    createdAt: u.createdAt,
+  }));
+  res.json({ users: safeUsers });
+});
+
+// 2. Register New User (Accessible from all devices)
+app.post('/api/auth/register', (req: Request, res: Response) => {
+  try {
+    const { name, email, password, initialPathway } = req.body;
+    const trimmedName = (name || '').trim();
+    const trimmedEmail = (email || '').trim().toLowerCase();
+
+    if (!trimmedName) {
+      res.status(400).json({ success: false, message: 'Please enter your name.' });
+      return;
+    }
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
+      return;
+    }
+
+    const users = loadServerUsers();
+    const existing = users.find((u) => u.email.toLowerCase() === trimmedEmail);
+    if (existing) {
+      res.status(400).json({
+        success: false,
+        message: 'An account with this email already exists. Please log in.',
+      });
+      return;
+    }
+
+    const newUser = {
+      id: 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      name: trimmedName,
+      email: trimmedEmail,
+      password: password || '',
+      savedPathway: initialPathway || null,
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(newUser);
+    saveServerUsers(users);
+
+    res.json({ success: true, user: newUser });
+  } catch (err: any) {
+    console.error('Error during registration:', err);
+    res.status(500).json({ success: false, message: 'Server error during registration.' });
+  }
+});
+
+// 3. Login User (Cross-Device Access)
+app.post('/api/auth/login', (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+    const trimmedEmail = (email || '').trim().toLowerCase();
+
+    if (!trimmedEmail) {
+      res.status(400).json({ success: false, message: 'Please enter your email.' });
+      return;
+    }
+
+    const users = loadServerUsers();
+    const user = users.find((u) => u.email.toLowerCase() === trimmedEmail);
+
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'Account not found. Please sign up to create your profile.',
+      });
+      return;
+    }
+
+    if (user.password && password !== undefined && user.password !== password) {
+      res.status(401).json({
+        success: false,
+        message: 'Incorrect password. Please try again.',
+      });
+      return;
+    }
+
+    res.json({ success: true, user });
+  } catch (err: any) {
+    console.error('Error during login:', err);
+    res.status(500).json({ success: false, message: 'Server error during login.' });
+  }
+});
+
+// 4. Update Pathway for User
+app.post('/api/auth/update-pathway', (req: Request, res: Response) => {
+  try {
+    const { userId, pathway } = req.body;
+    if (!userId) {
+      res.status(400).json({ success: false, message: 'User ID is required.' });
+      return;
+    }
+
+    const users = loadServerUsers();
+    const index = users.findIndex((u) => u.id === userId);
+    if (index === -1) {
+      res.status(404).json({ success: false, message: 'User not found on server.' });
+      return;
+    }
+
+    users[index].savedPathway = pathway;
+    saveServerUsers(users);
+
+    res.json({ success: true, user: users[index] });
+  } catch (err: any) {
+    console.error('Error updating pathway:', err);
+    res.status(500).json({ success: false, message: 'Server error updating pathway.' });
+  }
+});
+
+// 5. Synchronize Local Storage Accounts to Server (Seamless device bridging)
+app.post('/api/auth/sync', (req: Request, res: Response) => {
+  try {
+    const { users: incomingUsers } = req.body;
+    if (!Array.isArray(incomingUsers)) {
+      res.json({ success: true, count: 0 });
+      return;
+    }
+
+    const serverUsers = loadServerUsers();
+    let addedCount = 0;
+
+    for (const incoming of incomingUsers) {
+      if (!incoming || !incoming.email) continue;
+      const emailLower = incoming.email.trim().toLowerCase();
+      const existingIdx = serverUsers.findIndex((u) => u.email.toLowerCase() === emailLower);
+      if (existingIdx === -1) {
+        serverUsers.push({
+          id: incoming.id || ('user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7)),
+          name: incoming.name || 'Student',
+          email: emailLower,
+          password: incoming.password || '',
+          savedPathway: incoming.savedPathway || null,
+          createdAt: incoming.createdAt || new Date().toISOString(),
+        });
+        addedCount++;
+      } else if (incoming.savedPathway && !serverUsers[existingIdx].savedPathway) {
+        serverUsers[existingIdx].savedPathway = incoming.savedPathway;
+      }
+    }
+
+    if (addedCount > 0) {
+      saveServerUsers(serverUsers);
+    }
+
+    res.json({ success: true, totalUsers: serverUsers.length, added: addedCount });
+  } catch (err: any) {
+    console.error('Error syncing users:', err);
+    res.status(500).json({ success: false, message: 'Sync failed.' });
+  }
+});
 
 // Initialize Google GenAI with recommended server-side settings
 const ai = new GoogleGenAI({
