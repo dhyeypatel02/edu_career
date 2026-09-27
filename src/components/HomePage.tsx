@@ -79,7 +79,6 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Nav Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-300">
             <a href="#how-it-works" className="hover:text-white transition">How It Works</a>
-            <a href="#streams" className="hover:text-white transition">11 Streams</a>
             <a href="#placement-hub" className="hover:text-white transition">9-Stage Execution Hub</a>
             <a href="#regulators" className="hover:text-white transition">Eligibility Rules</a>
           </nav>
@@ -307,60 +306,6 @@ export const HomePage: React.FC<HomePageProps> = ({
                 <div>
                   <h4 className="text-sm font-bold text-white">{stage.title}</h4>
                   <p className="text-xs text-neutral-400 mt-0.5 leading-relaxed">{stage.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 11 Streams Explorer */}
-      <section id="streams" className="py-16 border-t border-neutral-800/80 bg-[#0c0e14]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 text-xs font-mono font-semibold text-emerald-400 uppercase">
-              Holistic Coverage
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 tracking-tight">
-              Explore All 11 Recognized Streams
-            </h2>
-            <p className="text-sm text-neutral-400 mt-2">
-              From engineering & medical to corporate finance, corporate law, sports science, vocational precision manufacturing, and merchant navy.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {STREAMS_DATA.map((st) => (
-              <div
-                key={st.id}
-                className="rounded-2xl border border-neutral-800 bg-[#141720] p-6 flex flex-col justify-between hover:border-neutral-600 transition group"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-2xl">{st.icon}</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-neutral-400">
-                      {st.totalDegrees} Degrees
-                    </span>
-                  </div>
-                  <h3 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                    {st.title}
-                  </h3>
-                  <p className="text-xs text-neutral-400 mt-2 line-clamp-2 leading-relaxed">
-                    {st.description}
-                  </p>
-                </div>
-
-                <div className="mt-5 pt-4 border-t border-neutral-800/80 flex items-center justify-between">
-                  <span className="text-[11px] text-neutral-500 font-mono">
-                    {st.totalTracks} Sub-Tracks
-                  </span>
-                  <button
-                    onClick={onGetStarted}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 hover:text-emerald-300"
-                  >
-                    <span>View Stream</span>
-                    <ChevronRight className="h-3.5 w-3.5" />
-                  </button>
                 </div>
               </div>
             ))}
