@@ -588,6 +588,37 @@ export default function App() {
         onClose={() => setIsPlacementHubOpen(false)}
         onAskAI={handleAskAIWithQuestion}
         initialCareer={selectionState.selectedCareer}
+        selectedDegree={selectionState.selectedDegree}
+        selectedStream={selectionState.selectedStream}
+        currentUser={currentUser}
+        savedCareerIds={bookmarkedCareerIds}
+        onSaveGoal={(career, degree) => {
+          const stream = degree.streamIds?.[0] ? getStreamById(degree.streamIds[0]) : null;
+          const track = degree.trackIds?.[0] ? getTrackById(degree.trackIds[0]) : null;
+          setSelectionState((prev) => ({
+            ...prev,
+            selectedStream: stream || prev.selectedStream,
+            selectedTrack: track || prev.selectedTrack,
+            selectedDegree: degree,
+            selectedCareer: career,
+          }));
+          if (currentUser) {
+            const pathway: SavedUserPathway = {
+              streamId: degree.streamIds[0] || 'science-pcm',
+              trackId: degree.trackIds[0] || '',
+              degreeId: degree.id,
+              careerId: career.id,
+              streamTitle: stream?.title || 'Selected Stream',
+              trackTitle: track?.title || 'Selected Track',
+              degreeTitle: `${degree.code} - ${degree.title}`,
+              careerTitle: career.title,
+              savedAt: new Date().toISOString(),
+            };
+            updateUserPathway(currentUser.id, pathway).then((updated) => {
+              if (updated) setCurrentUser(updated);
+            });
+          }
+        }}
       />
 
       {/* Footer */}

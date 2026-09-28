@@ -42,7 +42,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   const stats = [
     { label: 'Stream Pathways', value: `${STREAMS_DATA.length}`, sub: 'Class 10 & 11-12' },
     { label: 'Degrees & Courses', value: `${DEGREES_DATA.length}+`, sub: 'B.Tech, MBBS, CA, Law & more' },
-    { label: 'Career Roadmaps', value: `${CAREERS_DATA.length}+`, sub: 'With 9-Stage Execution' },
+    { label: 'Career Roadmaps', value: `${CAREERS_DATA.length}+`, sub: 'With 6-Stage Execution' },
     { label: 'Statutory Councils', value: '10+', sub: 'UGC, AICTE, NMC, BCI, CoA' },
   ];
 
@@ -51,9 +51,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     { title: 'Projects Bank', desc: 'Beginner, Intermediate & Capstone blueprints' },
     { title: 'Certifications', desc: 'High-ROI verified credentials & licenses' },
     { title: 'Internships', desc: 'Cold outreach templates & stipend timelines' },
-    { title: 'ATS Resume', desc: 'Google XYZ bullet formulas & checklists' },
-    { title: 'Mock Interview', desc: 'Technical & HR Q&A with STAR frameworks' },
-    { title: 'Placements', desc: 'Aptitude, coding rounds & campus schedules' },
     { title: 'Job Matching', desc: 'Salary benchmarks for Tier 1, 2 & 3 colleges' },
     { title: 'Career Growth', desc: '0-2 yr, 2-5 yr & 5-8+ yr leadership progression' },
   ];
@@ -79,7 +76,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Nav Links */}
           <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-neutral-300">
             <a href="#how-it-works" className="hover:text-white transition">How It Works</a>
-            <a href="#placement-hub" className="hover:text-white transition">9-Stage Execution Hub</a>
+            <a href="#placement-hub" className="hover:text-white transition">Career Execution Hub</a>
             <a href="#regulators" className="hover:text-white transition">Eligibility Rules</a>
           </nav>
 
@@ -146,7 +143,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Subtitle */}
           <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg text-neutral-300 leading-relaxed">
             A comprehensive, verified Indian career decision engine. Map your exact journey from high school
-            streams to degrees, entrance exams, and a <strong className="text-white font-semibold">9-stage college-to-placement execution pipeline</strong>.
+            streams to degrees, entrance exams, and a <strong className="text-white font-semibold">6-stage college-to-placement execution pipeline</strong>.
           </p>
 
           {/* CTAs */}
@@ -164,7 +161,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-900/90 px-6 py-3.5 text-sm font-bold text-neutral-200 hover:border-neutral-500 hover:bg-neutral-800 transition active:scale-95"
             >
               <Zap className="h-4 w-4 text-emerald-400" />
-              <span>Explore 9-Stage Placement Hub</span>
+              <span>Explore Placement Hub</span>
             </button>
           </div>
 
@@ -269,7 +266,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
 
-      {/* 9-Stage College-to-Placement Pipeline Showcase */}
+      {/* 6-Stage College-to-Placement Pipeline Showcase */}
       <section id="placement-hub" className="py-16 border-t border-neutral-800/80 bg-[#0f1218]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
@@ -278,10 +275,10 @@ export const HomePage: React.FC<HomePageProps> = ({
                 Execution Engine
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-white mt-3 tracking-tight">
-                The 9-Stage College-to-Career Launchpad
+                The 6-Stage College-to-Career Launchpad
               </h2>
               <p className="text-sm text-neutral-400 mt-1 max-w-2xl">
-                We don't stop at degree advice. For every single career, you get actionable playbooks to build your portfolio and crack corporate placements.
+                We don't stop at degree advice. For every single career, you get actionable playbooks connecting your degree directly to your target job.
               </p>
             </div>
 

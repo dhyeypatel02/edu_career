@@ -4,38 +4,45 @@ import {
   Code2,
   Award,
   Briefcase,
-  FileText,
-  Mic,
-  Target,
   Search,
   TrendingUp,
-  CheckCircle2,
   Copy,
   Check,
   Sparkles,
-  ExternalLink,
-  ChevronDown,
-  ChevronUp,
   Flag,
   ArrowRight,
+  ArrowLeft,
   ShieldCheck,
   Zap,
+  GraduationCap,
 } from 'lucide-react';
-import { Career } from '../types/career';
+import { Career, Degree } from '../types/career';
 import { getCareerExecutionPipeline } from '../data';
 
 interface CareerExecutionHubProps {
   career: Career;
+  selectedDegree?: Degree | null;
   onAskAI?: (prompt: string) => void;
 }
 
-export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, onAskAI }) => {
+export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({
+  career,
+  selectedDegree,
+  onAskAI,
+}) => {
   const pipeline = getCareerExecutionPipeline(career);
 
-  // Active stage tab (1 through 9, or 'all')
+  // Active stage tab (1 through 6)
   const [activeStage, setActiveStage] = useState<number>(1);
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [expandedQA, setExpandedQA] = useState<number | null>(0);
+
+  // Filter checklist items to only include active stages (Skills, Projects, Certs, Internships, Jobs)
+  const activeChecklistItems = pipeline.checklistItems.filter(
+    (item) =>
+      item.stageName !== 'Resume & Portfolio' &&
+      item.stageName !== 'Mock Interview' &&
+      item.stageName !== 'Placement Prep'
+  );
 
   // Readiness checklist state stored in localStorage
   const storageKey = `educareer_readiness_${career.id}`;
@@ -63,30 +70,30 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
     }));
   };
 
-  const totalChecklist = pipeline.checklistItems.length;
-  const completedCount = pipeline.checklistItems.filter((item) => checkedItems[item.id]).length;
+  const totalChecklist = activeChecklistItems.length;
+  const completedCount = activeChecklistItems.filter((item) => checkedItems[item.id]).length;
   const readinessPercentage = totalChecklist > 0 ? Math.round((completedCount / totalChecklist) * 100) : 0;
 
   const getReadinessLevel = (pct: number) => {
-    if (pct >= 85) return { title: 'Placement Ready (Apex)', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' };
-    if (pct >= 60) return { title: 'Internship Ready', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' };
-    if (pct >= 30) return { title: 'Foundations Built', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' };
+    if (pct >= 80) return { title: 'Placement Ready (Apex)', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' };
+    if (pct >= 55) return { title: 'Internship Ready', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' };
+    if (pct >= 25) return { title: 'Foundations Built', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' };
     return { title: 'Early Explorer', color: 'text-neutral-400', bg: 'bg-neutral-800 border-neutral-700' };
   };
 
   const readinessMeta = getReadinessLevel(readinessPercentage);
 
+  // 6 Streamlined, User-Friendly Stages (Removed Resume, Mock Interview, and Placement Preparation)
   const stagesList = [
-    { num: 1, title: 'Skill Learning', icon: BookOpen, color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-emerald-950/20' },
-    { num: 2, title: 'Projects', icon: Code2, color: 'text-amber-400', border: 'border-amber-500/30', bg: 'bg-amber-950/20' },
-    { num: 3, title: 'Certifications', icon: Award, color: 'text-purple-400', border: 'border-purple-500/30', bg: 'bg-purple-950/20' },
-    { num: 4, title: 'Internships', icon: Briefcase, color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-950/20' },
-    { num: 5, title: 'Resume & Portfolio', icon: FileText, color: 'text-orange-400', border: 'border-orange-500/30', bg: 'bg-orange-950/20' },
-    { num: 6, title: 'Mock Interview', icon: Mic, color: 'text-pink-400', border: 'border-pink-500/30', bg: 'bg-pink-950/20' },
-    { num: 7, title: 'Placement Preparation', icon: Target, color: 'text-indigo-400', border: 'border-indigo-500/30', bg: 'bg-indigo-950/20' },
-    { num: 8, title: 'Job Recommendation', icon: Search, color: 'text-teal-400', border: 'border-teal-500/30', bg: 'bg-teal-950/20' },
-    { num: 9, title: 'Career Growth', icon: TrendingUp, color: 'text-yellow-400', border: 'border-yellow-500/30', bg: 'bg-yellow-950/20' },
+    { num: 1, title: 'Skill Learning', shortTitle: '1. Skills', desc: 'Core Competencies', icon: BookOpen, color: 'text-emerald-400', border: 'border-emerald-500/30', bg: 'bg-emerald-950/20' },
+    { num: 2, title: 'Projects Bank', shortTitle: '2. Projects', desc: 'Hands-on Portfolio', icon: Code2, color: 'text-amber-400', border: 'border-amber-500/30', bg: 'bg-amber-950/20' },
+    { num: 3, title: 'Certifications', shortTitle: '3. Certifications', desc: 'High-ROI Credentials', icon: Award, color: 'text-purple-400', border: 'border-purple-500/30', bg: 'bg-purple-950/20' },
+    { num: 4, title: 'Internships', shortTitle: '4. Internships', desc: 'Playbook & Outreach', icon: Briefcase, color: 'text-blue-400', border: 'border-blue-500/30', bg: 'bg-blue-950/20' },
+    { num: 5, title: 'Jobs & Salary Market', shortTitle: '5. Jobs & Salary', desc: 'Packages & Hiring Hubs', icon: Search, color: 'text-teal-400', border: 'border-teal-500/30', bg: 'bg-teal-950/20' },
+    { num: 6, title: 'Career Growth Ladder', shortTitle: '6. Career Growth', desc: 'Promotions & Future Tech', icon: TrendingUp, color: 'text-yellow-400', border: 'border-yellow-500/30', bg: 'bg-yellow-950/20' },
   ];
+
+  const currentStageMeta = stagesList.find((s) => s.num === activeStage) || stagesList[0];
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(
@@ -97,25 +104,40 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
   };
 
   return (
-    <div className="w-full space-y-8">
-      {/* Top Banner: Flowchart Summary & Readiness Score */}
-      <div className="rounded-2xl border border-neutral-800 bg-[#12151c] p-6 sm:p-8 shadow-xl relative overflow-hidden">
+    <div className="w-full space-y-6">
+      {/* Top Pathway Connection Header & Readiness Score */}
+      <div className="rounded-2xl border border-neutral-800 bg-[#12151c] p-5 sm:p-7 shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-mono font-semibold text-emerald-400 flex items-center gap-1.5">
                 <Zap className="h-3 w-3" />
-                College-to-Career Execution Engine
+                College-to-Career Launchpad
               </span>
-              <span className="text-xs text-neutral-400">• Practical 9-Stage Blueprint</span>
+              <span className="text-xs text-neutral-400">• Clear 6-Step Execution Plan</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              Action Plan: How to Become a {career.title}
+
+            <h2 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight flex flex-wrap items-center gap-2">
+              <span>Path:</span>
+              {selectedDegree ? (
+                <span className="text-emerald-400 flex items-center gap-1.5 font-bold">
+                  <GraduationCap className="h-5 w-5" />
+                  {selectedDegree.code || selectedDegree.title}
+                </span>
+              ) : (
+                <span className="text-neutral-400">Undergraduate Degree</span>
+              )}
+              <ArrowRight className="h-4 w-4 text-neutral-500" />
+              <span className="text-white flex items-center gap-1.5 font-bold">
+                <Briefcase className="h-5 w-5 text-teal-400" />
+                {career.title}
+              </span>
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-400 mt-1 max-w-2xl">
-              From day 1 in college through skill acquisition, projects, internships, ATS resumes, and placements to full-time career launch.
+
+            <p className="text-xs sm:text-sm text-neutral-400 max-w-2xl leading-relaxed">
+              Step-by-step launchpad to guide you through skills, portfolio projects, certifications, internships, salary reality, and career growth.
             </p>
           </div>
 
@@ -123,7 +145,7 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
           <div className="w-full lg:w-auto shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/90 p-4 min-w-[280px]">
             <div className="flex items-center justify-between gap-3 mb-2">
               <span className="text-xs font-mono text-neutral-400 font-semibold uppercase">
-                Career Readiness Meter
+                Readiness Meter
               </span>
               <span className={`text-[11px] font-mono px-2 py-0.5 rounded border ${readinessMeta.bg} ${readinessMeta.color} font-bold`}>
                 {readinessPercentage}%
@@ -145,64 +167,76 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
           </div>
         </div>
 
-        {/* 9-Stage Horizontal Interactive Flowchart Ribbon */}
-        <div className="mt-8 pt-6 border-t border-neutral-800/80">
+        {/* 6-Stage Horizontal Interactive Flowchart Ribbon */}
+        <div className="mt-6 pt-5 border-t border-neutral-800/80">
           <div className="text-[11px] font-mono text-neutral-400 uppercase tracking-wider mb-3 flex items-center justify-between">
-            <span>9-Stage Execution Pipeline (Click any stage to view details):</span>
-            <span className="text-[10px] text-neutral-500 hidden sm:inline">Flow: Skills → Projects → Certs → Internships → Resume → Interview → Placements → Jobs → Growth</span>
+            <span>6-Stage Roadmap (Click any stage below to jump):</span>
+            <span className="text-[10px] text-neutral-500 hidden sm:inline">
+              Step {activeStage} of 6: {currentStageMeta.title}
+            </span>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-3 scrollbar-thin">
-            {stagesList.map((st, i) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            {stagesList.map((st) => {
               const Icon = st.icon;
               const isCurrent = activeStage === st.num;
 
               return (
-                <React.Fragment key={st.num}>
-                  {i > 0 && <span className="text-neutral-700 text-xs shrink-0 select-none">→</span>}
-                  <button
-                    onClick={() => setActiveStage(st.num)}
-                    className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold shrink-0 transition-all ${
-                      isCurrent
-                        ? 'bg-white text-neutral-950 shadow-md ring-2 ring-emerald-400/50 scale-105'
-                        : 'border border-neutral-800 bg-[#161922] text-neutral-300 hover:border-neutral-700 hover:text-white'
-                    }`}
-                  >
-                    <Icon className={`h-3.5 w-3.5 ${isCurrent ? 'text-neutral-950' : st.color}`} />
-                    <span className="whitespace-nowrap">{st.title}</span>
-                  </button>
-                </React.Fragment>
+                <button
+                  key={st.num}
+                  onClick={() => setActiveStage(st.num)}
+                  className={`flex flex-col items-start gap-1 p-3 rounded-xl border text-left transition-all ${
+                    isCurrent
+                      ? 'bg-neutral-800/90 border-emerald-400 shadow-md ring-1 ring-emerald-400/40 translate-y-[-1px]'
+                      : 'border-neutral-800/80 bg-[#151821] text-neutral-400 hover:border-neutral-700 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className={`p-1.5 rounded-lg ${isCurrent ? 'bg-emerald-500/20 text-emerald-400' : 'bg-neutral-800 text-neutral-400'}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded ${isCurrent ? 'bg-emerald-500/20 text-emerald-300' : 'bg-neutral-800/60 text-neutral-500'}`}>
+                      0{st.num}
+                    </span>
+                  </div>
+                  <span className={`text-xs font-bold mt-1 line-clamp-1 ${isCurrent ? 'text-white' : 'text-neutral-300'}`}>
+                    {st.title}
+                  </span>
+                  <span className="text-[10px] text-neutral-500 line-clamp-1">
+                    {st.desc}
+                  </span>
+                </button>
               );
             })}
-            <span className="text-neutral-700 text-xs shrink-0 select-none">→</span>
-            <div className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/40 px-3 py-2 text-xs font-bold text-emerald-300 shrink-0">
-              <Flag className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Career Launch</span>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Main Dynamic Stage Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Stage Detail (2 Cols) */}
         <div className="lg:col-span-2 space-y-6">
           {/* Stage 1: Skill Learning */}
           {activeStage === 1 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  <BookOpen className="h-5 w-5" />
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <BookOpen className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Stage 1: Core Skills & Learning Pathways</h3>
+                    <p className="text-xs text-neutral-400">Master essential foundations and practical technical competencies</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 1: Skill Learning Hub</h3>
-                  <p className="text-xs text-neutral-400">Master core foundational and applied technical competencies</p>
-                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  Step 1 of 6
+                </span>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {pipeline.skillsHub.map((group, idx) => (
-                  <div key={idx} className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-5">
+                  <div key={idx} className="rounded-xl border border-neutral-800/80 bg-neutral-900/60 p-4 sm:p-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                       <h4 className="text-sm font-bold text-white flex items-center gap-2">
                         <span className="flex h-5 w-5 items-center justify-center rounded-md bg-neutral-800 text-[10px] font-mono text-emerald-400">
@@ -254,18 +288,23 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
 
           {/* Stage 2: Projects */}
           {activeStage === 2 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  <Code2 className="h-5 w-5" />
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <Code2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Stage 2: Hands-On Portfolio Projects</h3>
+                    <p className="text-xs text-neutral-400">Tiered project ideas that make recruiters stop and notice you</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 2: Tiered Project Ideas Bank</h3>
-                  <p className="text-xs text-neutral-400">Build high-impact resume portfolio projects tailored to recruiters</p>
-                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  Step 2 of 6
+                </span>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {pipeline.projects.map((proj, pIdx) => {
                   const tierBadgeColor =
                     proj.tier === 'Industry Capstone'
@@ -275,7 +314,7 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
                       : 'border-blue-500/40 bg-blue-950/30 text-blue-400';
 
                   return (
-                    <div key={pIdx} className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5 space-y-3">
+                    <div key={pIdx} className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4 sm:p-5 space-y-3">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <span className={`text-[10px] font-mono uppercase px-2.5 py-0.5 rounded border font-bold w-fit ${tierBadgeColor}`}>
                           Tier: {proj.tier}
@@ -321,20 +360,25 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
 
           {/* Stage 3: Certifications */}
           {activeStage === 3 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  <Award className="h-5 w-5" />
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <Award className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Stage 3: High-ROI Certifications</h3>
+                    <p className="text-xs text-neutral-400">Industry-recognized credentials that actually pass recruiter screens</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 3: High-ROI Certifications</h3>
-                  <p className="text-xs text-neutral-400">Industry-recognized credentials that actually pass recruiter screens</p>
-                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  Step 3 of 6
+                </span>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
                 {pipeline.certifications.map((cert, cIdx) => (
-                  <div key={cIdx} className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5 space-y-2">
+                  <div key={cIdx} className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4 sm:p-5 space-y-2">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-white">{cert.name}</span>
@@ -364,15 +408,20 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
 
           {/* Stage 4: Internships */}
           {activeStage === 4 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                  <Briefcase className="h-5 w-5" />
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <Briefcase className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Stage 4: Internship Playbook</h3>
+                    <p className="text-xs text-neutral-400">Application windows, stipends, and proven cold outreach email template</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 4: Internship Playbook</h3>
-                  <p className="text-xs text-neutral-400">Strategies, timelines, and outreach templates to land your first role</p>
-                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                  Step 4 of 6
+                </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -427,211 +476,22 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
             </div>
           )}
 
-          {/* Stage 5: Resume & Portfolio */}
+          {/* Stage 5: Jobs & Salary Market (Formerly Stage 8) */}
           {activeStage === 5 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 5: Resume & ATS Portfolio Blueprint</h3>
-                  <p className="text-xs text-neutral-400">Beat automated filters with high-conversion bullet formulas</p>
-                </div>
-              </div>
-
-              {/* Google XYZ Formula */}
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5 space-y-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono uppercase font-bold text-orange-400">The Google XYZ Resume Formula:</span>
-                  <span className="text-xs text-neutral-400">"Accomplished [X], as measured by [Y], by doing [Z]"</span>
-                </div>
-
-                <div className="space-y-3">
-                  {pipeline.resumeGuide.googleXyzExamples.map((item, gIdx) => (
-                    <div key={gIdx} className="rounded-lg border border-neutral-800 bg-[#0f1115] p-3.5 space-y-2">
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] font-mono">
-                        <span className="text-emerald-300"><strong className="text-neutral-500">X (Outcome):</strong> {item.x}</span>
-                        <span className="text-amber-300"><strong className="text-neutral-500">Y (Metric):</strong> {item.y}</span>
-                        <span className="text-cyan-300"><strong className="text-neutral-500">Z (Method):</strong> {item.z}</span>
-                      </div>
-                      <div className="pt-2 border-t border-neutral-800 text-xs text-white font-medium">
-                        "{item.fullBullet}"
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Verbs */}
-              <div>
-                <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block mb-2 font-semibold">
-                  High-Impact Action Verbs to Use:
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {pipeline.resumeGuide.actionVerbs.map((verb, vIdx) => (
-                    <span key={vIdx} className="rounded-md border border-neutral-700 bg-neutral-800 px-2.5 py-1 text-xs font-mono text-neutral-200">
-                      {verb}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              {/* ATS Guidelines */}
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block mb-2 font-semibold">
-                  ATS Formatting Checklist:
-                </span>
-                <ul className="space-y-1.5 text-xs text-neutral-300">
-                  {pipeline.resumeGuide.atsGuidelines.map((guide, gIdx) => (
-                    <li key={gIdx} className="flex items-start gap-2">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400 mt-0.5 shrink-0" />
-                      <span>{guide}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
-
-          {/* Stage 6: Mock Interview */}
-          {activeStage === 6 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
               <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
-                    <Mic className="h-5 w-5" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                    <Search className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold text-white">Stage 6: Mock Interview & Q&A Arena</h3>
-                    <p className="text-xs text-neutral-400">Master technical logic and behavioral STAR narratives</p>
+                    <h3 className="text-lg font-bold text-white">Stage 5: Jobs & Salary Benchmark Reality</h3>
+                    <p className="text-xs text-neutral-400">Realistic starting CTC packages and verified top hiring companies</p>
                   </div>
                 </div>
-
-                {onAskAI && (
-                  <button
-                    onClick={() =>
-                      onAskAI(
-                        `Conduct a simulated mock interview with me for the role of "${career.title}". Start with 1 challenging technical question and wait for my response before evaluating!`
-                      )
-                    }
-                    className="flex items-center gap-1.5 rounded-lg border border-pink-500/40 bg-pink-950/30 px-3 py-1.5 text-xs font-bold text-pink-300 hover:bg-pink-900/40 transition shadow-sm"
-                  >
-                    <Sparkles className="h-3.5 w-3.5 text-pink-400" />
-                    <span className="hidden sm:inline">AI Mock Interviewer</span>
-                  </button>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                {pipeline.mockInterviews.map((qa, qIdx) => {
-                  const isExpanded = expandedQA === qIdx;
-
-                  return (
-                    <div
-                      key={qIdx}
-                      className="rounded-xl border border-neutral-800 bg-neutral-900/60 overflow-hidden transition"
-                    >
-                      <button
-                        onClick={() => setExpandedQA(isExpanded ? null : qIdx)}
-                        className="w-full text-left p-4 flex items-center justify-between gap-3 hover:bg-neutral-800/40 transition"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span className="rounded bg-neutral-800 border border-neutral-700 px-2 py-0.5 text-[10px] font-mono text-neutral-300">
-                            {qa.roundType}
-                          </span>
-                          <span className="text-xs sm:text-sm font-bold text-white">{qa.question}</span>
-                        </div>
-                        {isExpanded ? <ChevronUp className="h-4 w-4 text-neutral-400" /> : <ChevronDown className="h-4 w-4 text-neutral-400" />}
-                      </button>
-
-                      {isExpanded && (
-                        <div className="p-4 pt-0 border-t border-neutral-800/60 space-y-3 bg-[#0f1115]/50">
-                          <div>
-                            <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block mb-1">
-                              Model Answer Framework:
-                            </span>
-                            <p className="text-xs text-neutral-300 leading-relaxed font-mono">
-                              {qa.idealAnswerFramework}
-                            </p>
-                          </div>
-
-                          <div className="rounded-lg border border-pink-500/30 bg-pink-950/20 p-2.5 text-xs text-pink-300">
-                            <strong>💡 Pro Interview Tip:</strong> {qa.starTip}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Stage 7: Placement Preparation */}
-          {activeStage === 7 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                  <Target className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 7: Campus & Off-Campus Placement Prep</h3>
-                  <p className="text-xs text-neutral-400">3-phase timetable and aptitude mastery plan</p>
-                </div>
-              </div>
-
-              {/* 3-Phase Timetable */}
-              <div className="space-y-4">
-                {pipeline.placementPrep.timelinePhases.map((phase, pIdx) => (
-                  <div key={pIdx} className="rounded-xl border border-neutral-800 bg-neutral-900/60 p-4 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-white">{phase.phase}</span>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-800 text-neutral-300 border border-neutral-700">
-                        {phase.duration}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {phase.focusAreas.map((f, fIdx) => (
-                        <span key={fIdx} className="text-xs text-neutral-300 bg-[#0f1115] border border-neutral-800 px-2 py-1 rounded">
-                          • {f}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Recruitment Rounds */}
-              <div className="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4">
-                <span className="text-[10px] font-mono text-neutral-400 uppercase tracking-wider block mb-2 font-semibold">
-                  Standard Company Recruitment Rounds:
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                  Step 5 of 6
                 </span>
-                <div className="space-y-1.5 text-xs text-neutral-300">
-                  {pipeline.placementPrep.recruitmentRounds.map((round, rIdx) => (
-                    <div key={rIdx} className="flex items-center gap-2">
-                      <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-900 text-indigo-300 text-[10px] font-mono">
-                        {rIdx + 1}
-                      </span>
-                      <span>{round}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Stage 8: Job Market & Recommendations */}
-          {activeStage === 8 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
-                  <Search className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 8: Job Market & Compensation Reality</h3>
-                  <p className="text-xs text-neutral-400">Realistic starting packages and verified top hiring companies</p>
-                </div>
               </div>
 
               {/* Salary Tiers */}
@@ -678,17 +538,22 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
             </div>
           )}
 
-          {/* Stage 9: Career Growth */}
-          {activeStage === 9 && (
-            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 sm:p-7 space-y-6 animate-in fade-in duration-200">
-              <div className="flex items-center gap-3 border-b border-neutral-800 pb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
-                  <TrendingUp className="h-5 w-5" />
+          {/* Stage 6: Career Growth (Formerly Stage 9) */}
+          {activeStage === 6 && (
+            <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-7 space-y-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                    <TrendingUp className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Stage 6: Long-Term Career Growth Ladder</h3>
+                    <p className="text-xs text-neutral-400">Promotions, seniority milestones, and future-proof specializations</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">Stage 9: Long-Term Career Growth Ladder</h3>
-                  <p className="text-xs text-neutral-400">Promotions, seniority milestones, and future-proof specializations</p>
-                </div>
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                  Step 6 of 6
+                </span>
               </div>
 
               <div className="relative pl-6 border-l-2 border-neutral-800 space-y-6">
@@ -740,15 +605,48 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
               </div>
             </div>
           )}
+
+          {/* Guided Stage Step-through Footer */}
+          <div className="flex items-center justify-between pt-2 border-t border-neutral-800/60 text-xs">
+            <button
+              onClick={() => setActiveStage((prev) => Math.max(1, prev - 1))}
+              disabled={activeStage === 1}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold transition ${
+                activeStage === 1
+                  ? 'text-neutral-600 cursor-not-allowed'
+                  : 'text-neutral-300 hover:text-white bg-neutral-900 hover:bg-neutral-800 border border-neutral-800'
+              }`}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Previous Stage</span>
+            </button>
+
+            <span className="text-neutral-500 font-mono text-[11px]">
+              Stage {activeStage} of 6
+            </span>
+
+            <button
+              onClick={() => setActiveStage((prev) => Math.min(6, prev + 1))}
+              disabled={activeStage === 6}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg font-semibold transition ${
+                activeStage === 6
+                  ? 'text-neutral-600 cursor-not-allowed'
+                  : 'text-emerald-400 hover:text-emerald-300 bg-emerald-950/30 hover:bg-emerald-950/50 border border-emerald-500/30'
+              }`}
+            >
+              <span>Next Stage</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* Right Column: Interactive Student Readiness Checklist */}
         <div className="space-y-6">
-          <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-6 space-y-4">
+          <div className="rounded-2xl border border-neutral-800 bg-[#14171e] p-5 sm:p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-emerald-400" />
-                Readiness Checklist
+                Readiness Milestones
               </h3>
               <span className="text-[11px] font-mono text-neutral-400">
                 {completedCount}/{totalChecklist} Done
@@ -756,11 +654,11 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
             </div>
 
             <p className="text-xs text-neutral-400 leading-relaxed">
-              Check off each milestone as you achieve it during college to calculate your live placement readiness score.
+              Check off each milestone as you achieve it during college to calculate your live career readiness score.
             </p>
 
             <div className="space-y-3 pt-2">
-              {pipeline.checklistItems.map((item) => {
+              {activeChecklistItems.map((item) => {
                 const isChecked = !!checkedItems[item.id];
 
                 return (
@@ -806,13 +704,13 @@ export const CareerExecutionHub: React.FC<CareerExecutionHubProps> = ({ career, 
               <button
                 onClick={() =>
                   onAskAI(
-                    `I am preparing for a career as a "${career.title}". I have completed ${completedCount} out of ${totalChecklist} milestones in my readiness checklist. What should be my immediate next step this month to maximize my placement chances?`
+                    `I am studying/preparing for the course "${selectedDegree?.title || 'college'}" aiming to become a "${career.title}". I have completed ${completedCount} out of ${totalChecklist} milestones in my launchpad checklist. What should be my immediate next step this month to maximize my placement chances?`
                   )
                 }
                 className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-900 p-3 text-xs font-bold text-white hover:border-neutral-500 hover:bg-neutral-800 transition active:scale-95 shadow-sm"
               >
                 <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-                <span>Ask AI for Next Month's Target</span>
+                <span>Ask AI: What's My Next Step?</span>
               </button>
             )}
           </div>
