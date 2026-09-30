@@ -50,8 +50,8 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Top Page Tabs */}
-          <nav className="flex items-center gap-1 sm:gap-1.5 border-l border-neutral-800 pl-3 sm:pl-5">
+          {/* Top Page Tabs - Visible on Desktop / Tablet (sm and above) */}
+          <nav className="hidden sm:flex items-center gap-1 sm:gap-1.5 border-l border-neutral-800 pl-3 sm:pl-5">
             {/* Career Pathways / Decision Engine Tab */}
             {onGoToPathways && (
               <button
@@ -88,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Global Actions */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {/* Quick Search Button */}
           <button
             onClick={onOpenSearch}
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Compare Tool */}
           <button
             onClick={onOpenCompare}
-            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 sm:px-3 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
+            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
             title="Compare pathways side by side"
           >
             <GitCompare className="h-3.5 w-3.5 text-neutral-400" />
@@ -161,7 +161,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500/20 text-emerald-300 font-bold text-xs">
                 {user.name.charAt(0).toUpperCase()}
               </div>
-              <span className="max-w-[85px] truncate font-medium">{user.name.split(' ')[0]}</span>
+              <span className="max-w-[75px] sm:max-w-[85px] truncate font-medium">{user.name.split(' ')[0]}</span>
               {user.savedPathway && (
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" title="Active pathway locked" />
               )}
@@ -176,10 +176,10 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           )}
 
-          {/* AI Counsellor Button */}
+          {/* AI Counsellor Button - Desktop view */}
           <button
             onClick={onOpenAICounsellor}
-            className="group relative flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-900/90 px-3 py-1.5 text-xs font-semibold text-neutral-200 hover:border-neutral-500 hover:text-white shadow-sm transition active:scale-95"
+            className="hidden sm:flex group relative items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-900/90 px-3 py-1.5 text-xs font-semibold text-neutral-200 hover:border-neutral-500 hover:text-white shadow-sm transition active:scale-95"
           >
             <Sparkles className="h-3.5 w-3.5 text-emerald-400 transition-transform duration-300 group-hover:rotate-12" />
             <span>AI Counsellor</span>
@@ -188,6 +188,61 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
         </div>
+      </div>
+
+      {/* Mobile Navigation Sub-Bar (Strictly on mobile devices < sm, completely hidden on PC) */}
+      <div className="sm:hidden border-t border-neutral-800/80 bg-[#0e1016] px-3 py-1.5 flex items-center justify-between gap-1.5">
+        {onGoToPathways && (
+          <button
+            onClick={onGoToPathways}
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${
+              activeTab === 'app'
+                ? 'bg-neutral-800 text-white border border-neutral-700 shadow-sm'
+                : 'text-neutral-400 hover:text-white'
+            }`}
+          >
+            <Compass className={`h-3.5 w-3.5 ${activeTab === 'app' ? 'text-emerald-400' : 'text-neutral-400'}`} />
+            <span>Pathways</span>
+          </button>
+        )}
+
+        <button
+          onClick={onOpenPlacementHub}
+          className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition ${
+            activeTab === 'placement-hub'
+              ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/50 shadow-sm'
+              : 'text-neutral-400 hover:text-white'
+          }`}
+        >
+          <Zap className="h-3.5 w-3.5 text-emerald-400" />
+          <span>Placement Hub</span>
+        </button>
+
+        {onGoHome && (
+          <button
+            onClick={onGoHome}
+            className="flex items-center justify-center px-2.5 py-1.5 rounded-lg text-xs text-neutral-400 hover:text-white"
+            title="Return to Home"
+          >
+            <Home className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        <button
+          onClick={onOpenCompare}
+          className="flex items-center justify-center px-2.5 py-1.5 rounded-lg text-xs text-neutral-400 hover:text-white"
+          title="Compare Courses"
+        >
+          <GitCompare className="h-3.5 w-3.5" />
+        </button>
+
+        <button
+          onClick={onOpenAICounsellor}
+          className="flex items-center justify-center px-2.5 py-1.5 rounded-lg text-xs text-emerald-400 bg-emerald-950/30 border border-emerald-500/30"
+          title="AI Counsellor"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+        </button>
       </div>
     </header>
   );

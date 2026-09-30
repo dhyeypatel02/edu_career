@@ -253,7 +253,7 @@ export const PlacementHubPage: React.FC<PlacementHubPageProps> = ({
           </div>
 
           {/* Quick Search */}
-          <div className="relative min-w-[260px] md:w-80">
+          <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-neutral-500" />
             <input
               type="text"
@@ -273,10 +273,41 @@ export const PlacementHubPage: React.FC<PlacementHubPageProps> = ({
           </div>
         </div>
 
+        {/* Mobile Course Switcher Carousel (Visible strictly on mobile & tablet < lg, completely hidden on PC) */}
+        <div className="lg:hidden rounded-xl border border-neutral-800 bg-[#12151e] p-3 space-y-2 shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-bold text-white uppercase flex items-center gap-1.5">
+              <GraduationCap className="h-4 w-4 text-emerald-400" />
+              Pick Course ({filteredDegrees.length}):
+            </span>
+            <span className="text-[10px] text-emerald-400 font-mono">Tap to switch course</span>
+          </div>
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
+            {filteredDegrees.map((deg) => {
+              const isSelected = activeDegree.id === deg.id;
+              return (
+                <button
+                  key={deg.id}
+                  onClick={() => handleSelectDegree(deg)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all ${
+                    isSelected
+                      ? 'border border-emerald-400 bg-emerald-950/60 text-emerald-300 font-bold shadow-sm'
+                      : 'border border-neutral-800 bg-neutral-900/80 text-neutral-300 hover:border-neutral-700'
+                  }`}
+                >
+                  <GraduationCap className={`h-3.5 w-3.5 ${isSelected ? 'text-emerald-400' : 'text-neutral-500'}`} />
+                  <span>{deg.code}</span>
+                  <span className="text-[10px] font-mono text-neutral-400">({deg.duration})</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 2-Column Responsive Workspace */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Course Directory (4 cols on lg) */}
-          <div className="lg:col-span-4 rounded-2xl border border-neutral-800 bg-[#12151e] p-4 space-y-3 shadow-lg">
+          {/* Left Column: Course Directory (Visible on PC/Desktop lg:col-span-4, hidden on small screens) */}
+          <div className="hidden lg:block lg:col-span-4 rounded-2xl border border-neutral-800 bg-[#12151e] p-4 space-y-3 shadow-lg">
             <div className="flex items-center justify-between pb-2 border-b border-neutral-800/80 px-1">
               <div className="flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-emerald-400" />
@@ -362,7 +393,7 @@ export const PlacementHubPage: React.FC<PlacementHubPageProps> = ({
                 </div>
 
                 {/* Salary Reality Gauge */}
-                <div className="w-full sm:w-auto shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/90 p-4 min-w-[260px]">
+                <div className="w-full sm:w-auto shrink-0 rounded-xl border border-neutral-800 bg-neutral-900/90 p-4 sm:min-w-[260px]">
                   <div className="flex items-center justify-between text-xs mb-1">
                     <span className="font-mono text-neutral-400 font-semibold uppercase">
                       Starting Package

@@ -651,7 +651,7 @@ export default function App() {
       </main>
 
       {/* Floating AI Counsellor Action Button */}
-      <div className="fixed bottom-6 right-6 z-30 print:hidden">
+      <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-30 print:hidden">
         <button
           onClick={() => {
             setAiInitialQuestion('');
