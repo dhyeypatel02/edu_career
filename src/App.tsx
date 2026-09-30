@@ -34,7 +34,7 @@ import { CompareModal } from './components/CompareModal';
 import { SavedPathsModal } from './components/SavedPathsModal';
 import { AuthModal } from './components/AuthModal';
 import { UserProfileModal } from './components/UserProfileModal';
-import { PlacementHubModal } from './components/PlacementHubModal';
+import { PlacementHubPage } from './components/PlacementHubPage';
 import { HomePage } from './components/HomePage';
 import { LoginPage } from './components/LoginPage';
 
@@ -45,14 +45,14 @@ export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  // Active Screen View: 'home' (creative landing page) | 'login' (compulsory auth gate) | 'app' (decision engine)
-  const [activeView, setActiveView] = useState<'home' | 'login' | 'app'>('home');
+  // Active Screen View: 'home' (creative landing page) | 'login' (compulsory auth gate) | 'app' (decision engine) | 'placement-hub' (full placement page)
+  const [activeView, setActiveView] = useState<'home' | 'login' | 'app' | 'placement-hub'>('home');
   const [loginMode, setLoginMode] = useState<'login' | 'signup'>('login');
   const [pendingAction, setPendingAction] = useState<'placementHub' | 'counsellor' | null>(null);
 
-  // Compulsory authentication: Cannot access the interactive app without logging in
+  // Compulsory authentication: Cannot access the interactive app or placement hub without logging in
   useEffect(() => {
-    if (activeView === 'app' && !currentUser) {
+    if ((activeView === 'app' || activeView === 'placement-hub') && !currentUser) {
       setLoginMode('login');
       setActiveView('login');
     }
@@ -80,7 +80,6 @@ export default function App() {
   // Modal Visibility States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAICounsellorOpen, setIsAICounsellorOpen] = useState(false);
-  const [isPlacementHubOpen, setIsPlacementHubOpen] = useState(false);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
   const [compareInitialDegreeId, setCompareInitialDegreeId] = useState<string | undefined>();
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
@@ -164,13 +163,15 @@ export default function App() {
         setCurrentUser({ ...updated });
       }
     }
-    setActiveView('app');
     if (pendingAction === 'placementHub') {
-      setIsPlacementHubOpen(true);
+      setActiveView('placement-hub');
       setPendingAction(null);
     } else if (pendingAction === 'counsellor') {
+      setActiveView('app');
       setIsAICounsellorOpen(true);
       setPendingAction(null);
+    } else {
+      setActiveView('app');
     }
   };
 
@@ -386,8 +387,7 @@ export default function App() {
             setLoginMode('login');
             setActiveView('login');
           } else {
-            setActiveView('app');
-            setIsPlacementHubOpen(true);
+            setActiveView('placement-hub');
           }
         }}
         onOpenAICounsellor={() => {
@@ -415,20 +415,157 @@ export default function App() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#0f1115] text-[#f1f3f7] flex flex-col font-sans">
-      {/* Top Header */}
-      <div className="print:hidden">
-        <Header
-          selectionState={selectionState}
-          onReset={handleReset}
+  // Render Full Placement Hub Page
+  if (activeView === 'placement-hub') {
+    return (
+      <div className="min-h-screen bg-[#0f1115] text-[#f1f3f7] flex flex-col font-sans">
+        <PlacementHubPage
+          user={currentUser}
+          initialCareer={selectionState.selectedCareer}
+          selectedDegree={selectionState.selectedDegree}
+          savedCount={bookmarkedCareerIds.length}
           onGoHome={() => setActiveView('home')}
+          onGoToPathways={() => setActiveView('app')}
           onOpenSearch={() => setIsSearchOpen(true)}
           onOpenAICounsellor={() => {
             setAiInitialQuestion('');
             setIsAICounsellorOpen(true);
           }}
-          onOpenPlacementHub={() => setIsPlacementHubOpen(true)}
+          onOpenCompare={() => {
+            setCompareInitialDegreeId(selectionState.selectedDegree?.id || 'btech-cse');
+            setIsCompareOpen(true);
+          }}
+          onOpenBookmarks={() => setIsBookmarksOpen(true)}
+          onOpenAuth={() => {
+            setLoginMode('login');
+            setActiveView('login');
+          }}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onAskAI={handleAskAIWithQuestion}
+          onSaveGoal={(career, degree) => {
+            const stream = degree.streamIds?.[0] ? getStreamById(degree.streamIds[0]) : null;
+            const track = degree.trackIds?.[0] ? getTrackById(degree.trackIds[0]) : null;
+            setSelectionState((prev) => ({
+              ...prev,
+              selectedStream: stream || prev.selectedStream,
+              selectedTrack: track || prev.selectedTrack,
+              selectedDegree: degree,
+              selectedCareer: career,
+            }));
+            if (currentUser) {
+              const pathway: SavedUserPathway = {
+                streamId: degree.streamIds[0] || 'science-pcm',
+                trackId: degree.trackIds[0] || '',
+                degreeId: degree.id,
+                careerId: career.id,
+                streamTitle: stream?.title || 'Selected Stream',
+                trackTitle: track?.title || 'Selected Track',
+                degreeTitle: `${degree.code} - ${degree.title}`,
+                careerTitle: career.title,
+                savedAt: new Date().toISOString(),
+              };
+              updateUserPathway(currentUser.id, pathway).then((updated) => {
+                if (updated) setCurrentUser(updated);
+              });
+            }
+          }}
+          onExploreInRoadmap={(degree, career) => {
+            const stream = degree.streamIds?.[0] ? getStreamById(degree.streamIds[0]) : null;
+            const track = degree.trackIds?.[0] ? getTrackById(degree.trackIds[0]) : null;
+            setSelectionState((prev) => ({
+              ...prev,
+              currentStep: 4,
+              selectedStream: stream || prev.selectedStream,
+              selectedTrack: track || prev.selectedTrack,
+              selectedDegree: degree,
+              selectedCareer: career,
+            }));
+            setActiveView('app');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+        />
+
+        {/* Global Modals accessible from Placement Hub as well */}
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          pendingPathway={currentPathwayObj}
+          onAuthSuccess={handleAuthSuccess}
+          initialMode={authMode}
+        />
+
+        <UserProfileModal
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          user={currentUser}
+          onLogout={handleLogout}
+          onLoadPathway={(pathway) => {
+            loadPathwayIntoState(pathway);
+            setActiveView('app');
+          }}
+          onChangePathway={handleChangePathway}
+          onRemovePathway={handleRemoveUserPathway}
+        />
+
+        <AICounsellorModal
+          isOpen={isAICounsellorOpen}
+          onClose={() => {
+            setIsAICounsellorOpen(false);
+            setAiInitialQuestion('');
+          }}
+          selectionState={selectionState}
+          initialQuestion={aiInitialQuestion}
+        />
+
+        <GlobalSearchModal
+          isOpen={isSearchOpen}
+          onClose={() => setIsSearchOpen(false)}
+          onSelectResult={(result) => {
+            handleSelectSearchResult(result);
+            setActiveView('app');
+          }}
+        />
+
+        <CompareModal
+          isOpen={isCompareOpen}
+          onClose={() => setIsCompareOpen(false)}
+          initialDegreeId={compareInitialDegreeId}
+          onSelectDegreeForRoadmap={(deg) => {
+            handleSelectDegree(deg);
+            setActiveView('app');
+          }}
+        />
+
+        <SavedPathsModal
+          isOpen={isBookmarksOpen}
+          onClose={() => setIsBookmarksOpen(false)}
+          savedCareerIds={bookmarkedCareerIds}
+          onRemoveBookmark={(id) => handleToggleBookmark(id)}
+          onLoadSavedCareer={(c) => {
+            handleLoadSavedCareer(c);
+            setActiveView('app');
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#0f1115] text-[#f1f3f7] flex flex-col font-sans">
+      {/* Top Header */}
+      <div className="print:hidden">
+        <Header
+          activeTab="app"
+          selectionState={selectionState}
+          onReset={handleReset}
+          onGoHome={() => setActiveView('home')}
+          onGoToPathways={() => setActiveView('app')}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenAICounsellor={() => {
+            setAiInitialQuestion('');
+            setIsAICounsellorOpen(true);
+          }}
+          onOpenPlacementHub={() => setActiveView('placement-hub')}
           onOpenCompare={() => {
             setCompareInitialDegreeId(selectionState.selectedDegree?.id || 'btech-cse');
             setIsCompareOpen(true);
@@ -585,44 +722,6 @@ export default function App() {
         savedCareerIds={bookmarkedCareerIds}
         onRemoveBookmark={(id) => handleToggleBookmark(id)}
         onLoadSavedCareer={handleLoadSavedCareer}
-      />
-
-      <PlacementHubModal
-        isOpen={isPlacementHubOpen}
-        onClose={() => setIsPlacementHubOpen(false)}
-        onAskAI={handleAskAIWithQuestion}
-        initialCareer={selectionState.selectedCareer}
-        selectedDegree={selectionState.selectedDegree}
-        selectedStream={selectionState.selectedStream}
-        currentUser={currentUser}
-        savedCareerIds={bookmarkedCareerIds}
-        onSaveGoal={(career, degree) => {
-          const stream = degree.streamIds?.[0] ? getStreamById(degree.streamIds[0]) : null;
-          const track = degree.trackIds?.[0] ? getTrackById(degree.trackIds[0]) : null;
-          setSelectionState((prev) => ({
-            ...prev,
-            selectedStream: stream || prev.selectedStream,
-            selectedTrack: track || prev.selectedTrack,
-            selectedDegree: degree,
-            selectedCareer: career,
-          }));
-          if (currentUser) {
-            const pathway: SavedUserPathway = {
-              streamId: degree.streamIds[0] || 'science-pcm',
-              trackId: degree.trackIds[0] || '',
-              degreeId: degree.id,
-              careerId: career.id,
-              streamTitle: stream?.title || 'Selected Stream',
-              trackTitle: track?.title || 'Selected Track',
-              degreeTitle: `${degree.code} - ${degree.title}`,
-              careerTitle: career.title,
-              savedAt: new Date().toISOString(),
-            };
-            updateUserPathway(currentUser.id, pathway).then((updated) => {
-              if (updated) setCurrentUser(updated);
-            });
-          }
-        }}
       />
 
       {/* Footer */}

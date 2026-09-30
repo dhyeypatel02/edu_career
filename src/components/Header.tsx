@@ -1,11 +1,13 @@
 import React from 'react';
-import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User, Zap, Home } from 'lucide-react';
+import { Search, Sparkles, Bookmark, GitCompare, RotateCcw, User, Zap, Home, Compass } from 'lucide-react';
 import { StudentSelectionState, UserProfile } from '../types/career';
 
 interface HeaderProps {
-  selectionState: StudentSelectionState;
-  onReset: () => void;
+  selectionState?: StudentSelectionState;
+  activeTab?: 'app' | 'placement-hub' | 'home';
+  onReset?: () => void;
   onGoHome?: () => void;
+  onGoToPathways?: () => void;
   onOpenSearch: () => void;
   onOpenAICounsellor: () => void;
   onOpenPlacementHub: () => void;
@@ -19,8 +21,10 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   selectionState,
+  activeTab = 'app',
   onReset,
   onGoHome,
+  onGoToPathways,
   onOpenSearch,
   onOpenAICounsellor,
   onOpenPlacementHub,
@@ -34,8 +38,8 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-neutral-800 bg-[#0f1115]/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand */}
-        <div className="flex items-center gap-3">
+        {/* Brand & Main Navigation Tabs */}
+        <div className="flex items-center gap-4 sm:gap-6">
           <button
             onClick={onGoHome || onReset}
             className="group flex items-baseline gap-2.5 text-left focus:outline-none cursor-pointer"
@@ -44,10 +48,43 @@ export const Header: React.FC<HeaderProps> = ({
             <span className="text-xl font-extrabold tracking-tight text-white transition-colors group-hover:text-neutral-200">
               Edu Career<span className="text-emerald-400">.</span>
             </span>
-            <span className="hidden md:inline-block text-xs text-neutral-400 border-l border-neutral-800 pl-2.5">
-              Career & Education Pathways
-            </span>
           </button>
+
+          {/* Top Page Tabs */}
+          <nav className="flex items-center gap-1 sm:gap-1.5 border-l border-neutral-800 pl-3 sm:pl-5">
+            {/* Career Pathways / Decision Engine Tab */}
+            {onGoToPathways && (
+              <button
+                onClick={onGoToPathways}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs font-semibold transition ${
+                  activeTab === 'app'
+                    ? 'border border-neutral-700 bg-neutral-800 text-white shadow-sm'
+                    : 'text-neutral-400 hover:text-white hover:bg-neutral-900/60'
+                }`}
+                title="Interactive 4-Step Career Decision Engine"
+              >
+                <Compass className={`h-3.5 w-3.5 ${activeTab === 'app' ? 'text-emerald-400' : 'text-neutral-400'}`} />
+                <span>Pathways</span>
+              </button>
+            )}
+
+            {/* Placement Hub Tab */}
+            <button
+              onClick={onOpenPlacementHub}
+              className={`flex items-center gap-1.5 rounded-lg px-2.5 sm:px-3 py-1.5 text-xs font-semibold transition ${
+                activeTab === 'placement-hub'
+                  ? 'border border-emerald-500/50 bg-emerald-950/50 text-emerald-300 shadow-sm'
+                  : 'text-neutral-300 hover:text-white hover:bg-neutral-900/60'
+              }`}
+              title="Campus Placements, Recruiters & Salary Intelligence"
+            >
+              <Zap className={`h-3.5 w-3.5 ${activeTab === 'placement-hub' ? 'text-emerald-400' : 'text-emerald-400'}`} />
+              <span>Placement Hub</span>
+              <span className="hidden md:inline rounded bg-emerald-500/20 px-1 py-0.2 text-[9px] font-mono text-emerald-300">
+                Live
+              </span>
+            </button>
+          </nav>
         </div>
 
         {/* Global Actions */}
@@ -55,45 +92,32 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Quick Search Button */}
           <button
             onClick={onOpenSearch}
-            className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-400 transition hover:border-neutral-700 hover:text-neutral-200"
+            className="flex items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 sm:px-3 py-1.5 text-xs text-neutral-400 transition hover:border-neutral-700 hover:text-neutral-200"
           >
             <Search className="h-3.5 w-3.5 text-neutral-400" />
-            <span className="hidden sm:inline">Search career, degree, exam...</span>
-            <span className="sm:hidden">Search</span>
-            <kbd className="hidden lg:inline rounded border border-neutral-700 bg-neutral-800 px-1 text-[10px] text-neutral-400">
+            <span className="hidden lg:inline">Search career, degree, exam...</span>
+            <span className="hidden sm:inline lg:hidden">Search</span>
+            <kbd className="hidden xl:inline rounded border border-neutral-700 bg-neutral-800 px-1 text-[10px] text-neutral-400">
               ⌘K
             </kbd>
           </button>
 
-          {/* Home Page Link */}
+          {/* Home Link */}
           {onGoHome && (
             <button
               onClick={onGoHome}
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
+              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
               title="Return to Home Overview"
             >
               <Home className="h-3.5 w-3.5 text-neutral-400" />
-              <span className="hidden sm:inline">Home</span>
+              <span className="hidden md:inline">Home</span>
             </button>
           )}
-
-          {/* Placement Hub Button */}
-          <button
-            onClick={onOpenPlacementHub}
-            className="flex items-center gap-1.5 rounded-lg border border-emerald-500/40 bg-emerald-950/30 px-3 py-1.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-900/40 hover:border-emerald-400"
-            title="College-to-Placement Career Hub"
-          >
-            <Zap className="h-3.5 w-3.5 text-emerald-400" />
-            <span className="hidden md:inline">Placement Hub</span>
-            <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-mono text-emerald-300">
-              Launchpad
-            </span>
-          </button>
 
           {/* Compare Tool */}
           <button
             onClick={onOpenCompare}
-            className="flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
+            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 sm:px-3 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
             title="Compare pathways side by side"
           >
             <GitCompare className="h-3.5 w-3.5 text-neutral-400" />
@@ -103,7 +127,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Bookmarks */}
           <button
             onClick={onOpenBookmarks}
-            className="relative flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-3 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
+            className="relative flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/80 px-2.5 sm:px-3 py-1.5 text-xs text-neutral-300 transition hover:border-neutral-700 hover:text-white"
             title="Saved Career Pathways"
           >
             <Bookmark className="h-3.5 w-3.5 text-neutral-400" />
@@ -115,8 +139,8 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
 
-          {/* Reset / Start Over if in middle */}
-          {selectionState.currentStep > 1 && (
+          {/* Reset / Start Over if in middle of multi-step pathways */}
+          {selectionState && selectionState.currentStep > 1 && onReset && (
             <button
               onClick={onReset}
               className="flex items-center gap-1.5 rounded-lg border border-neutral-800 bg-neutral-900/60 px-2.5 py-1.5 text-xs text-neutral-400 transition hover:border-neutral-700 hover:text-neutral-200"
