@@ -12,8 +12,16 @@ export const TRACKS_DATA: Track[] = [
     mandatorySubjects: ['Physics', 'Chemistry', 'Mathematics', 'English'],
     recommendedElectives: ['Computer Science (Python & SQL)', 'Informatics Practices'],
     difficultyLevel: 'Rigorous',
-    primaryEntranceFocus: ['JEE Main', 'JEE Advanced', 'BITSAT', 'State CETs (MHT-CET, KCET, WBJEE)'],
-    degreeIds: ['btech-cse', 'btech-ece', 'btech-mech-aero'],
+    primaryEntranceFocus: ['JEE Main', 'JEE Advanced', 'BITSAT', 'State CETs (MHT-CET, KCET, WBJEE, GUJCET)'],
+    degreeIds: [
+      'btech-cse',
+      'btech-ece',
+      'btech-ic',
+      'btech-ict',
+      'btech-eee',
+      'btech-civil',
+      'btech-mech-aero',
+    ],
     keyCompetencies: ['Algorithmic Thinking', 'Calculus & Mechanics', 'Abstract Problem Solving'],
   },
   {
