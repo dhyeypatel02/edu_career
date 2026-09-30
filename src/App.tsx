@@ -418,32 +418,36 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0f1115] text-[#f1f3f7] flex flex-col font-sans">
       {/* Top Header */}
-      <Header
-        selectionState={selectionState}
-        onReset={handleReset}
-        onGoHome={() => setActiveView('home')}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenAICounsellor={() => {
-          setAiInitialQuestion('');
-          setIsAICounsellorOpen(true);
-        }}
-        onOpenPlacementHub={() => setIsPlacementHubOpen(true)}
-        onOpenCompare={() => {
-          setCompareInitialDegreeId(selectionState.selectedDegree?.id || 'btech-cse');
-          setIsCompareOpen(true);
-        }}
-        onOpenBookmarks={() => setIsBookmarksOpen(true)}
-        savedCount={bookmarkedCareerIds.length}
-        user={currentUser}
-        onOpenAuth={() => {
-          setLoginMode('login');
-          setActiveView('login');
-        }}
-        onOpenProfile={() => setIsProfileOpen(true)}
-      />
+      <div className="print:hidden">
+        <Header
+          selectionState={selectionState}
+          onReset={handleReset}
+          onGoHome={() => setActiveView('home')}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenAICounsellor={() => {
+            setAiInitialQuestion('');
+            setIsAICounsellorOpen(true);
+          }}
+          onOpenPlacementHub={() => setIsPlacementHubOpen(true)}
+          onOpenCompare={() => {
+            setCompareInitialDegreeId(selectionState.selectedDegree?.id || 'btech-cse');
+            setIsCompareOpen(true);
+          }}
+          onOpenBookmarks={() => setIsBookmarksOpen(true)}
+          savedCount={bookmarkedCareerIds.length}
+          user={currentUser}
+          onOpenAuth={() => {
+            setLoginMode('login');
+            setActiveView('login');
+          }}
+          onOpenProfile={() => setIsProfileOpen(true)}
+        />
+      </div>
 
       {/* Decision Tree Flow Tracker */}
-      <FlowProgress state={selectionState} onJumpToStep={handleJumpToStep} />
+      <div className="print:hidden">
+        <FlowProgress state={selectionState} onJumpToStep={handleJumpToStep} />
+      </div>
 
       {/* Main Multi-Step Content */}
       <main className="flex-1">
