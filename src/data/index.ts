@@ -6,6 +6,7 @@ import { CAREERS_DATA } from './careersData';
 import { CAREER_EXECUTION_PIPELINES, getCareerExecutionPipeline } from './careerExecutionData';
 
 export { STREAMS_DATA, TRACKS_DATA, DEGREES_DATA, CAREERS_DATA, CAREER_EXECUTION_PIPELINES, getCareerExecutionPipeline };
+export * from './placementMatcherData';
 
 export function getStreamById(id: StreamId | string): Stream | undefined {
   return STREAMS_DATA.find((s) => s.id === id);
